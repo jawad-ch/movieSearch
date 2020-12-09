@@ -1,13 +1,6 @@
-import { useState, useEffect} from 'react'
+import { useState, useEffect, useCallback} from 'react'
 
-import { SEARCH_BASE_URL,
-    POPULAR_BASE_URL,
-    API_URL,
-    API_KEY,
-    IMAGE_BASE_URL, 
-    BACKDROP_SIZE, 
-    POSTER_SIZE 
-} from '../../config'
+import { POPULAR_BASE_URL } from '../../config'
 
 export const useHomeFetch = () => {
 
@@ -15,7 +8,7 @@ export const useHomeFetch = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
-    const fetchMovies = (endpoint, type) => {
+    const fetchMovies = useCallback((endpoint, type) => {
         setError(false);
         setLoading(true);
     
@@ -34,25 +27,6 @@ export const useHomeFetch = () => {
                 currentPage: data.page,
                 totalPages: data.total_pages,
               })
-            // if (searchTerm !== '') {
-            //   console.log('searchTerm :', searchTerm)
-            //   setState(prev => ({
-            //     ...prev,
-            //     searchedMovies:[...data.results]
-            //   }))
-            // }else{
-            //   console.log('no searchTerm :', searchTerm)
-            //   setState(prev => ({
-            //     ...prev,
-            //     movies:
-            //       isLoadMore !== -1
-            //         ? [...prev.movies, ...data.results]
-            //         : [...data.results],
-            //     heroImage: prev.heroImage || data.results[0],
-            //     currentPage: data.page,
-            //     totalPages: data.total_pages,
-            //   }));
-            // }
 
           });
           
@@ -61,23 +35,11 @@ export const useHomeFetch = () => {
           console.log(error);
         }
         setLoading(false);
-      };
+      },[state]);
     
       // Fetch popular movies initially on mount
       useEffect(() => {
-        // if (sessionStorage.homeState) {
-        //   setState(JSON.parse(sessionStorage.homeState));
-        //   setLoading(false);
-        // } else {
           fetchMovies(POPULAR_BASE_URL, 'populaMovies');
-        // }
-      }, []);
-    
-      // useEffect(() => {
-      //   if (searchTerm !== '') {
-      //     sessionStorage.setItem('homeState', JSON.stringify(state));
-      //   }
-      // }, [searchTerm, state]);
-    
+      }, [fetchMovies]);
       return [{ state, loading, error }, fetchMovies];
     };
